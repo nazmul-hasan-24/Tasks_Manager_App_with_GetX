@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
+import 'package:task_manager/controllers/aouth_controller.dart';
 
 import 'network_response.dart';
 
@@ -10,19 +10,17 @@ class NetworkCaller {
   Future<NetworkResponse> postRequest(String url,
       {Map<String, dynamic>? body}) async {
     try {
-      log(url);
-      log(body.toString());
+   
       final Response response =
           await post(Uri.parse(url), body: jsonEncode(body), headers: {
         'Content-type': 'Application/json',
+        'token' : AuthController.token.toString(),
       }
       );
-      log(response.statusCode.toString());
-      log(response.body.toString());
+    
       debugPrint(response.statusCode.toString());
       debugPrint(response.body);
-      // print('Status Code: ${response.statusCode}');
-      // print('Response body ${response.body}');
+     
       if (response.statusCode == 200) {
         return NetworkResponse(
           isSuccess: true,
@@ -35,8 +33,7 @@ class NetworkCaller {
           statusCode: response.statusCode,
           jsonResponse: jsonDecode(response.body),
         );
-        // print(response.body);
-        // print(response.statusCode);
+       
       }
     
     } catch (e) {

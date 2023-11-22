@@ -174,11 +174,11 @@ class _SignupPageState extends State<SignupPage> {
         textClear();
         if (mounted) {
           setState(() {});
-          showMessage(context, "Account has been created! Please login.");
+          showSnackMessage(context, "Account has been created! Please login.");
         }
       } else {
         if (mounted) {
-          showMessage(context, "Account creation failed! Try again", true);
+          showSnackMessage(context, "Account creation failed! Try again", true);
         }
       }
     }

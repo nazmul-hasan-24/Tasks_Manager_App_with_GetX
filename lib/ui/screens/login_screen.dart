@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_manager/controllers/aouth_controller.dart';
+import 'package:task_manager/data/models/user_model.dart';
 import 'package:task_manager/data/network_caller/network_caller.dart';
 import 'package:task_manager/data/network_caller/network_response.dart';
 import 'package:task_manager/data/utility/urls.dart';
@@ -21,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController __emailTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
- bool _loginInProgress= false;
+  bool _loginInProgress = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,8 +47,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       validator: (value) {
                         if (value!.trim().isEmpty ||
                             !RegExp(r'^[\w-\.]+@').hasMatch(value)) {
-                              return "Enter valid Email";
-                            }
+                          return "Enter valid Email";
+                        }
                         return null;
                       },
                       decoration: const InputDecoration(
@@ -59,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextFormField(
                       controller: _passwordTEController,
                       validator: (String? value) {
-                        if (value?.trim().isEmpty?? true) {
+                        if (value?.trim().isEmpty ?? true) {
                           return "Enter valid password";
                         }
                         return null;
@@ -71,12 +72,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     verticle(16.0),
                     Visibility(
-                    visible:_loginInProgress == false,
-                    replacement: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
+                      visible: _loginInProgress == false,
+                      replacement: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
                       child: ElevatedButton(
-                          onPressed:login,
+                          onPressed: login,
                           child: const Icon(Icons.arrow_circle_right)),
                     ),
                     verticle(48),
@@ -125,41 +126,46 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Future<void> login() async{
-    if(!_formKey.currentState!.validate()){
+  Future<void> login() async {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
-_loginInProgress= true;
-if(mounted){
-setState(() {});
-}
-
-
-NetworkResponse response = await NetworkCaller().postRequest(Urls.login, body: {
-   "email": __emailTEController.text.trim(),
-    "password":_passwordTEController.text,
-});
-_loginInProgress = false;
-if(mounted){
-  setState(() { });
-}if(response.isSuccess){
-SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-sharedPreferences.setString('token', response.jsonResponse['token']);
-
- if(mounted){
-  Navigator.push(context, MaterialPageRoute(builder: (context)=> const MainBottomNavScreen()));
- }
-} else{
-  if(response.statusCode == 401){
-   if(mounted){
-    showMessage(context,  "Please check Email or Passord");
-   }
-  } else{
-    if(mounted){
-      showMessage(context,  "Login failed! Try again");
+    _loginInProgress = true;
+    if (mounted) {
+      setState(() {});
     }
-  }
-}
+
+    NetworkResponse response =
+        await NetworkCaller().postRequest(Urls.login, body: {
+      "email": __emailTEController.text.trim(),
+      "password": _passwordTEController.text,
+    });
+    _loginInProgress = false;
+    if (mounted) {
+      setState(() {});
+    }
+    if (response.isSuccess) {
+    
+          await AuthController.saveUserInformation('token', UserModel.formJson(response.jsonResponse['data']));
+     
+
+      if (mounted) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const MainBottomNavScreen()));
+      }
+    } else {
+      if (response.statusCode == 401) {
+        if (mounted) {
+          showSnackMessage(context, "Please check Email or Passord");
+        }
+      } else {
+        if (mounted) {
+          showSnackMessage(context, "Login failed! Try again");
+        }
+      }
+    }
   }
 
   @override

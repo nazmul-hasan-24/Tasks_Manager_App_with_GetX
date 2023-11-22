@@ -47,7 +47,10 @@ class TasksItemCard extends StatelessWidget {
               children: [
                 const Padding(
                   padding: EdgeInsets.all(12.0),
-                  child: Chip(label: Text("New")),
+                  child: Chip(
+                    label: Text("New"),
+                    backgroundColor: Colors.blue,
+                  ),
                 ),
                 Wrap(
                   children: [
