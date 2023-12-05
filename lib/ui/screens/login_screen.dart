@@ -4,8 +4,8 @@ import 'package:task_manager/data/models/user_model.dart';
 import 'package:task_manager/data/network_caller/network_caller.dart';
 import 'package:task_manager/data/network_caller/network_response.dart';
 import 'package:task_manager/data/utility/urls.dart';
+import 'package:task_manager/ui/screens/email_verification.dart';
 import 'package:task_manager/ui/screens/main_bottom_nav_screen.dart';
-import 'package:task_manager/ui/screens/pin_verifaction.dart';
 import 'package:task_manager/ui/screens/sign_up_page.dart';
 import 'package:task_manager/ui/widgets/body_background.dart';
 import 'package:task_manager/ui/widgets/show_snackbar.dart';
@@ -88,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  const PinVerifactionScreen(),
+                                  const ForgotPasswordScreen(),
                             ),
                           );
                         },
@@ -135,19 +135,21 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {});
     }
 
-    NetworkResponse response =
-        await NetworkCaller().postRequest(Urls.login, body: {
-      "email": __emailTEController.text.trim(),
-      "password": _passwordTEController.text,
-    });
+    NetworkResponse response = await NetworkCaller().postRequest(
+      Urls.login,
+      body: {
+        "email": __emailTEController.text.trim(),
+        "password": _passwordTEController.text,
+      },
+      isLogin: true,
+    );
     _loginInProgress = false;
     if (mounted) {
       setState(() {});
     }
     if (response.isSuccess) {
-    
-          await AuthController.saveUserInformation('token', UserModel.formJson(response.jsonResponse['data']));
-     
+      await AuthController.saveUserInformation(response.jsonResponse['token'],
+          UserModel.fromJson(response.jsonResponse['data']));
 
       if (mounted) {
         Navigator.push(
@@ -158,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       if (response.statusCode == 401) {
         if (mounted) {
-          showSnackMessage(context, "Please check Email or Passord");
+          showSnackMessage(context, "Please check Email or Password");
         }
       } else {
         if (mounted) {

@@ -6,11 +6,13 @@ import 'package:task_manager/ui/screens/splash_screen.dart';
 
 class TaskManager extends StatelessWidget {
   const TaskManager({super.key});
+  static GlobalKey<NavigatorState>  navigationKey = GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      navigatorKey: navigationKey,
       theme: ThemeData(
         inputDecorationTheme: const InputDecorationTheme(
            fillColor: Colors.white,

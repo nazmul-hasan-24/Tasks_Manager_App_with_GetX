@@ -57,12 +57,11 @@ class _SignupPageState extends State<SignupPage> {
                     TextFormField(
                       controller: _firstNameTEController,
                       validator: (String? value) {
-                       if(value!.trim().isEmpty || !RegExp(r'^[a-z A-Z]+$').hasMatch(value)){
-                        return "Enter correct name";
-                       } else{
-
-                       } return null;
-                      
+                        if (value!.trim().isEmpty ||
+                            !RegExp(r'^[a-z A-Z]+$').hasMatch(value)) {
+                          return "Enter correct name";
+                        } else {}
+                        return null;
                       },
                       decoration: const InputDecoration(
                         hintText: "First Name",
@@ -87,7 +86,6 @@ class _SignupPageState extends State<SignupPage> {
                     TextFormField(
                       controller: _numberTEController,
                       validator: (String? value) {
-                      
                         if (value!.length == 11) {
                         } else {
                           return "Number must be 11 digits: $value";
@@ -119,7 +117,7 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                     verticle(16.0),
                     ElevatedButton(
-                      onPressed: (){
+                      onPressed: () {
                         _signup();
                       },
                       child: const Icon(Icons.arrow_circle_right),
@@ -164,6 +162,7 @@ class _SignupPageState extends State<SignupPage> {
           "lastName": _secondNameTEController.text.trim(),
           "mobile": _numberTEController.text.trim(),
           "password": _passwordTEController.text,
+          
         },
       );
       signUpInProgress = false;

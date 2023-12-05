@@ -14,7 +14,7 @@ class SummaryCard extends StatelessWidget {
       padding: const EdgeInsets.all(12.0),
       child: Card(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical:10.0, horizontal: 30),
+          padding: const EdgeInsets.symmetric(vertical:10.0, horizontal: 25),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Column(

@@ -1,14 +1,18 @@
+
 import 'package:flutter/material.dart';
 import 'package:task_manager/data/network_caller/network_caller.dart';
 import 'package:task_manager/data/network_caller/network_response.dart';
 import 'package:task_manager/data/utility/urls.dart';
+import 'package:task_manager/ui/screens/main_bottom_nav_screen.dart';
+import 'package:task_manager/ui/screens/new_task_screen.dart';
 import 'package:task_manager/ui/widgets/body_background.dart';
 import 'package:task_manager/ui/widgets/profile_summery.dart';
 import 'package:task_manager/ui/widgets/show_snackbar.dart';
 import 'package:task_manager/ui/widgets/verticle.dart';
 
 class AddNewTask extends StatefulWidget {
-  const AddNewTask({super.key});
+ 
+  const AddNewTask({super.key       });
 
   @override
   State<AddNewTask> createState() => _AddNewTaskState();
@@ -16,9 +20,16 @@ class AddNewTask extends StatefulWidget {
 
 class _AddNewTaskState extends State<AddNewTask> {
   final TextEditingController _subjectTEController = TextEditingController();
-  final TextEditingController _descriptionTEController=  TextEditingController();
+  final TextEditingController _descriptionTEController =
+      TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _createTaskInProgress = false;
+@override
+  void initState() {
+   super.initState();
+   const NewTaskScreen();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -44,7 +55,7 @@ class _AddNewTaskState extends State<AddNewTask> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Add New Task",
+                                'Add New Task',
                                 style: Theme.of(context).textTheme.titleLarge,
                               ),
                               verticle(20),
@@ -52,24 +63,24 @@ class _AddNewTaskState extends State<AddNewTask> {
                                 controller: _subjectTEController,
                                 validator: (String? value) {
                                   if (value?.trim().isEmpty ?? true) {
-                                    return "Enter your subject";
+                                    return 'Enter your subject';
                                   }
                                   return null;
                                 },
                                 decoration:
-                                    const InputDecoration(hintText: "Subject"),
+                                    const InputDecoration(hintText: 'Subject'),
                               ),
                               verticle(10),
                               TextFormField(
                                 controller: _descriptionTEController,
                                 validator: (String? value) {
                                   if (value?.trim().isEmpty ?? true) {
-                                    return "Enter Description";
+                                    return 'Enter Description';
                                   }
                                   return null;
                                 },
                                 decoration: const InputDecoration(
-                                    hintText: "Descriptions"),
+                                    hintText: 'Descriptions'),
                                 maxLines: 8,
                               ),
                               verticle(15),
@@ -104,12 +115,17 @@ class _AddNewTaskState extends State<AddNewTask> {
       if (mounted) {
         setState(() {});
       }
-      final NetworkResponse response =
-          await NetworkCaller().postRequest(Urls.createNewTask, body: {
-            "title": _subjectTEController.text.trim(),
-            "description": _descriptionTEController.text.trim(),
-            "status": "New"
-          });
+      final NetworkResponse response = await NetworkCaller().postRequest(
+        Urls.createNewTask,
+       
+        body: {
+          'title': _subjectTEController.text.trim(),
+          'description': _descriptionTEController.text.trim(),
+          'status': 'New',
+          
+        },
+        
+      );
       _createTaskInProgress = false;
       if (mounted) {
         setState(() {});
@@ -117,9 +133,14 @@ class _AddNewTaskState extends State<AddNewTask> {
       if (response.isSuccess) {
         _subjectTEController.clear();
         _descriptionTEController.clear();
+        
         if (mounted) {
           showSnackMessage(context, 'New task added!');
+       const  NewTaskScreen();
+    
+           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const MainBottomNavScreen()), (route) => false);
         }
+       
       } else {
         if (mounted) {
           showSnackMessage(context, 'Create new task failed! Try again.', true);

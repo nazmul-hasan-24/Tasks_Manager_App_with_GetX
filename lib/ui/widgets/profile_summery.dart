@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:task_manager/controllers/aouth_controller.dart';
 import 'package:task_manager/ui/screens/edit_profile_screen.dart';
@@ -15,8 +17,19 @@ class ProfileSummery extends StatefulWidget {
 }
 
 class _ProfileSummeryState extends State<ProfileSummery> {
+
+ 
+ 
   @override
   Widget build(BuildContext context) {
+ String base64String = AuthController.user?.photo??'';
+  if (base64String.startsWith('data:image')) {
+  // Remove data URI prefix if present
+  base64String =
+  base64String.replaceFirst(RegExp(r'data:image/[^;]+;base64,'), '');
+  }
+ Uint8List imageBytes =
+      const Base64Decoder().convert(base64String);
     return ListTile(
       onTap: () {
         if (widget.enableOnTab) {
@@ -29,8 +42,16 @@ class _ProfileSummeryState extends State<ProfileSummery> {
         }
       },
       tileColor: Colors.green,
-      leading: const CircleAvatar(
-        child: Icon(Icons.person_2_rounded),
+      leading: ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: CircleAvatar(
+          child: AuthController.user?.photo == null
+              ? const Icon(Icons.person_2_rounded)
+              : Image.memory(
+                  imageBytes,
+                  fit: BoxFit.cover,
+                ),
+        ),
       ),
       title: Text(
         fullName,
@@ -59,7 +80,7 @@ class _ProfileSummeryState extends State<ProfileSummery> {
     );
   }
 
-  String get fullName{
-    return '${AuthController.user?.firstName??''} ${AuthController.user?.lastName??""}';
+  String get fullName {
+    return '${AuthController.user?.firstName ?? ''} ${AuthController.user?.lastName ?? ""}';
   }
 }

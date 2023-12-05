@@ -7,16 +7,18 @@ class BodyBackGround extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-        children: [
-        SvgPicture.asset(
-          "assets/images/background.svg",
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: double.infinity,
-          
-        ),
-        child
-      ]);
+    return SafeArea(
+      child: Stack(
+          children: [
+          SvgPicture.asset(
+            "assets/images/background.svg",
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+            
+          ),
+          child
+        ]),
+    );
   }
 }

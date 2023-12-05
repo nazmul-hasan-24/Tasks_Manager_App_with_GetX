@@ -12,18 +12,17 @@ class MainBottomNavScreen extends StatefulWidget {
 }
 
 class _MainBottomNavScreenState extends State<MainBottomNavScreen> {
-List screen =const [ 
-  NewTaskScreen(),
-  ProgressTasksScreen(),
-  CompletedTaskScreen(),
-  CancledTaskScreen()
+List screen = const [ 
+   NewTaskScreen(),
+   ProgressTasksScreen(),
+   CompletedTaskScreen(),
+   CancledTaskScreen()
 ];
 
   int _seletedIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       body: screen[_seletedIndex],
       bottomNavigationBar: BottomNavigationBar(
         onTap: (value) {
@@ -40,15 +39,15 @@ List screen =const [
          BottomNavigationBarItem(
        
             icon: Icon(
-              Icons.text_rotate_vertical,
+              Icons.task,
             ),
             label: ("New Task")
           ),
            BottomNavigationBarItem(
             icon: Icon(
-              Icons.work_history,
+              Icons.circle_outlined,
             ),
-            label: ("Inprogress")
+            label: ("Progressing")
           ),
            BottomNavigationBarItem(
             icon: Icon(
