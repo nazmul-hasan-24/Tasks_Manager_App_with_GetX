@@ -49,8 +49,8 @@ TaskListModel taskListModel = TaskListModel();
     } else {
       if (mounted) {
         showProgress = false;
-        ;
-        showSnackMessage(context, "Task deleted failed");
+        
+        showSnackMessage(context, "Task deletion failed");
         setState(() {
           
         });
@@ -76,9 +76,7 @@ TaskListModel taskListModel = TaskListModel();
             Expanded(
               child: Visibility(
                 visible: getProgressTaskInProgress == false,
-                // replacement: const Center(
-                //   child: CircularProgressIndicator(),
-                // ),
+                
                  replacement: const Center(
                   child: CircularProgressIndicator(),
                 ),

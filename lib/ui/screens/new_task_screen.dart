@@ -84,7 +84,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     } else {
       if (mounted) {
         showProgress = false;
-        ;
+        
         showSnackMessage(context, "Task deleted failed");
         setState(() {
           

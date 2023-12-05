@@ -51,7 +51,7 @@ Future<void> getCancleTaskList() async {
     } else {
       if (mounted) {
         showProgress = false;
-        ;
+        
         showSnackMessage(context, "Task deleted failed");
         setState(() {
           

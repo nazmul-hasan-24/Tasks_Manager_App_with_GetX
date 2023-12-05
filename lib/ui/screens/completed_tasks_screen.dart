@@ -50,7 +50,7 @@ class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
     } else {
       if (mounted) {
         showProgress = false;
-        ;
+        
         showSnackMessage(context, "Task deleted failed");
         setState(() {
           
