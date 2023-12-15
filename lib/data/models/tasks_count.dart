@@ -5,7 +5,7 @@ class TasksCount {
   TasksCount({this.sId, this.sum});
 
   TasksCount.fromJson(Map<String, dynamic> json) {
-    sId = json['_id'];
+    sId = json['_id'] ;
     sum = json['sum'];
   }
 

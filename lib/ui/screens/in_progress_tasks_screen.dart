@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager/data/models/task_list_model.dart';
-import 'package:task_manager/data/network_caller/network_caller.dart';
-import 'package:task_manager/data/network_caller/network_response.dart';
-import 'package:task_manager/data/utility/urls.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/controllers/delete_task_controller.dart';
+import 'package:task_manager/controllers/in_progress_tasks_controller.dart';
 import 'package:task_manager/ui/widgets/profile_summery.dart';
-import 'package:task_manager/ui/widgets/show_snackbar.dart';
 import 'package:task_manager/ui/widgets/task_items_cart.dart';
 
 class ProgressTasksScreen extends StatefulWidget {
@@ -15,53 +13,37 @@ class ProgressTasksScreen extends StatefulWidget {
 }
 
 class _ProgressTasksScreenState extends State<ProgressTasksScreen> {
-bool  getProgressTaskInProgress = false;
-TaskListModel taskListModel = TaskListModel();
-    Future<void> getProgressTaskList() async {
-    getProgressTaskInProgress = true;
-    if (mounted) {
-      setState(() {});
-    }
 
-    final NetworkResponse response =
-        await NetworkCaller().getRequest(Urls.getInProgressTasks);
-    if (response.isSuccess) {
-      taskListModel = TaskListModel.fromJson(response.jsonResponse);
-    }
-    getProgressTaskInProgress = false;
-    if (mounted) {
-      setState(() {});
-    }}
 
-     bool showProgress = false;
-  Future<void> deleteTaskById(String id) async {
-    showProgress = true;
-    setState(() {});
-    final response = await NetworkCaller().getRequest(
-      Urls.deleteTask(id),
-    );
-    if (response.isSuccess) {
-      if (mounted) {
-        showSnackMessage(context, "Task deleted successfully");
-      }
+  //    bool showProgress = false;
+  // Future<void> deleteTaskById(String id) async {
+  //   showProgress = true;
+  //   setState(() {});
+  //   final response = await NetworkCaller().getRequest(
+  //     Urls.deleteTask(id),
+  //   );
+  //   if (response.isSuccess) {
+  //     if (mounted) {
+  //       showSnackMessage(context, "Task deleted successfully");
+  //     }
 
-      getProgressTaskList();
-    } else {
-      if (mounted) {
-        showProgress = false;
+  //     getProgressTaskList();
+  //   } else {
+  //     if (mounted) {
+  //       showProgress = false;
         
-        showSnackMessage(context, "Task deletion failed");
-        setState(() {
+  //       showSnackMessage(context, "Task deletion failed");
+  //       setState(() {
           
-        });
-      }
-    }
-  }
+  //       });
+  //     }
+  //   }
+  // }
 
     @override
   void initState() {
     super.initState();
-    getProgressTaskList();
+   Get.find<InProgressTasksController>().getProgressTaskList();
   }
   
   @override
@@ -74,36 +56,37 @@ TaskListModel taskListModel = TaskListModel();
             const ProfileSummery(),
          
             Expanded(
-              child: Visibility(
-                visible: getProgressTaskInProgress == false,
-                
-                 replacement: const Center(
-                  child: CircularProgressIndicator(),
-                ),
-                child: RefreshIndicator(
-                  onRefresh: getProgressTaskList,
-                  child: ListView.builder(
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.all(10.0),
-                      itemCount: taskListModel.taskList?.length ?? 0,
-                      itemBuilder: (context, index) {
-                        return TasksItemCard(
-                          task: taskListModel.taskList![index],
-                          onStatusChange: () {
-                            getProgressTaskList();
-                          },
-                          showProgress: (inProgress){
-                            getProgressTaskInProgress = inProgress;
-                            if(mounted){
-                              setState(() { });
-                            }
-                          },
-                          onPressDeleted: (String id){
-                            deleteTaskById(id);
-                          },
-                        );
-                      }),
-                ),
+              child: GetBuilder<InProgressTasksController>(
+                builder: (inProgressTasksList) {
+                  return Visibility(
+                    visible: inProgressTasksList.getProgressTaskInProgress == false,
+                    
+                     replacement: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    child: RefreshIndicator(
+                      onRefresh: inProgressTasksList.getProgressTaskList,
+                      child: ListView.builder(
+                          shrinkWrap: true,
+                          padding: const EdgeInsets.all(10.0),
+                          itemCount: inProgressTasksList.taskListModel.taskList?.length ?? 0,
+                          itemBuilder: (context, index) {
+                            return TasksItemCard(
+                              task: inProgressTasksList.taskListModel.taskList![index],
+                              onStatusChange: () {
+                                inProgressTasksList.getProgressTaskList();
+                              },
+                              showProgress: (inProgress){
+                               
+                              },
+                              onPressDeleted: (String id){
+                              Get.find<DeleteTaskController>().deleteTaskById(id);
+                              },
+                            );
+                          }),
+                    ),
+                  );
+                }
               ),
             ),
           ],

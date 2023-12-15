@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SummaryCard extends StatelessWidget {
-  final String count, title;
+  final String? count, title;
   const SummaryCard({
     super.key,
     required this.count,
@@ -20,8 +20,8 @@ class SummaryCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(count,style: Theme.of(context).textTheme.titleLarge,),
-                 Text(title,style: Theme.of(context).textTheme.bodyLarge,)
+                Text(count.toString(),style: Theme.of(context).textTheme.titleLarge,),
+                 Text(title.toString(),style: Theme.of(context).textTheme.bodyLarge,)
               ],
             ),
           ),

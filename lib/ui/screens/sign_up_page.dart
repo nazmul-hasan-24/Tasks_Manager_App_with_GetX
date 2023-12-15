@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager/data/network_caller/network_caller.dart';
-import 'package:task_manager/data/network_caller/network_response.dart';
-import 'package:task_manager/data/utility/urls.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/controllers/add_new_task_controller.dart';
+import 'package:task_manager/controllers/sign_up_controller.dart';
 import 'package:task_manager/ui/widgets/body_background.dart';
 import 'package:task_manager/ui/widgets/show_snackbar.dart';
 import 'package:task_manager/ui/widgets/verticle.dart';
@@ -20,7 +20,8 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController _numberTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool signUpInProgress = false;
+  SignUpController signUpController = Get.find<SignUpController>();
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -116,11 +117,19 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                     ),
                     verticle(16.0),
-                    ElevatedButton(
-                      onPressed: () {
-                        _signup();
-                      },
-                      child: const Icon(Icons.arrow_circle_right),
+                    GetBuilder<AddNewTaskController>(
+                      builder: (addNewTaskController) {
+                        return Visibility(
+                          visible:addNewTaskController.createTaskInProgress ==false ,
+                          replacement: const Center(child: CircularProgressIndicator(),),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              _signup();
+                            },
+                            child: const Icon(Icons.arrow_circle_right),
+                          ),
+                        );
+                      }
                     ),
                     verticle(48),
                     Row(
@@ -149,35 +158,23 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Future<void> _signup() async {
-    signUpInProgress = true;
-    if (mounted) {
-      setState(() {});
-    }
     if (_formKey.currentState!.validate()) {
-      final NetworkResponse networkResponse = await NetworkCaller().postRequest(
-        Urls.registration,
-        body: {
-          "email": _emailTEController.text.trim(),
-          "firstName": _firstNameTEController.text.trim(),
-          "lastName": _secondNameTEController.text.trim(),
-          "mobile": _numberTEController.text.trim(),
-          "password": _passwordTEController.text,
-          
-        },
-      );
-      signUpInProgress = false;
-      if (mounted) {
-        setState(() {});
-      }
-      if (networkResponse.isSuccess) {
+      final networkResponse = await signUpController.signup(
+          email: _emailTEController.text.trim(),
+          firstName: _firstNameTEController.text.trim(),
+          lastName: _secondNameTEController.text.trim(),
+          mobile: _numberTEController.text.trim(),
+          password: _passwordTEController.text);
+
+      if (networkResponse) {
         textClear();
         if (mounted) {
-          setState(() {});
-          showSnackMessage(context, "Account has been created! Please login.");
+      
+          showSnackMessage(context, signUpController.message);
         }
       } else {
         if (mounted) {
-          showSnackMessage(context, "Account creation failed! Try again", true);
+          showSnackMessage(context, signUpController.message, true);
         }
       }
     }

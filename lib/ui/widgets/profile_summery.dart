@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:task_manager/controllers/aouth_controller.dart';
 import 'package:task_manager/ui/screens/edit_profile_screen.dart';
 import 'package:task_manager/ui/screens/splash_screen.dart';
@@ -18,8 +19,6 @@ class ProfileSummery extends StatefulWidget {
 
 class _ProfileSummeryState extends State<ProfileSummery> {
 
- 
- 
   @override
   Widget build(BuildContext context) {
  String base64String = AuthController.user?.photo??'';
@@ -33,12 +32,7 @@ class _ProfileSummeryState extends State<ProfileSummery> {
     return ListTile(
       onTap: () {
         if (widget.enableOnTab) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const EditProfileScreen(),
-            ),
-          );
+          Get.to(()=>const EditProfileScreen());
         }
       },
       tileColor: Colors.green,

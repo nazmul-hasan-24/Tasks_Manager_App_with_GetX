@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/controllers/main_bottom_navigation_controller.dart';
 import 'package:task_manager/ui/screens/cancled_tasks_screen.dart';
 import 'package:task_manager/ui/screens/completed_tasks_screen.dart';
 import 'package:task_manager/ui/screens/in_progress_tasks_screen.dart';
@@ -19,22 +21,22 @@ List screen = const [
    CancledTaskScreen()
 ];
 
-  int _seletedIndex = 0;
+MainBottomNavigationController mainBottomNavigationController = Get.find<MainBottomNavigationController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: screen[_seletedIndex],
+      body: screen[mainBottomNavigationController.seletedIndex],
       bottomNavigationBar: BottomNavigationBar(
         onTap: (value) {
           setState(() {
-    _seletedIndex=value;
+    mainBottomNavigationController.seletedIndex=value;
           });
         },
         showSelectedLabels: true,
         showUnselectedLabels: true,
         selectedItemColor: Colors.green,
         unselectedItemColor: Colors.grey,
-        currentIndex: _seletedIndex,
+        currentIndex: mainBottomNavigationController.seletedIndex,
         items: const [
          BottomNavigationBarItem(
        

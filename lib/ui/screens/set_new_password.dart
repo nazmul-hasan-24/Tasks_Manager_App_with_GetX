@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager/data/network_caller/network_caller.dart';
-import 'package:task_manager/data/network_caller/network_response.dart';
-import 'package:task_manager/data/utility/urls.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/controllers/set_new_password_controller.dart';
 import 'package:task_manager/ui/screens/login_screen.dart';
 import 'package:task_manager/ui/screens/sign_up_page.dart';
 import 'package:task_manager/ui/widgets/body_background.dart';
+import 'package:task_manager/ui/widgets/show_snackbar.dart';
 import 'package:task_manager/ui/widgets/verticle.dart';
 
 class SetPassword extends StatefulWidget {
@@ -17,12 +17,13 @@ class SetPassword extends StatefulWidget {
 }
 
 class _SetPasswordState extends State<SetPassword> {
+
   final TextEditingController _passwordTEController = TextEditingController();
   final TextEditingController _confirmpassTEController =
       TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  bool _loading = false;
+SetNewPasswordController setNewPasswordController = Get.find<SetNewPasswordController>();
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,20 +80,24 @@ class _SetPasswordState extends State<SetPassword> {
                       ),
                     ),
                     verticle(16.0),
-                    Visibility(
-                      visible: _loading == false,
-                      replacement: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                      child: ElevatedButton(
-                          onPressed: () {
-                            resetPassword();
-                          },
-                          style: const ButtonStyle(
-                              padding:
-                                  MaterialStatePropertyAll<EdgeInsetsGeometry>(
-                                      EdgeInsets.symmetric(vertical: 15.0))),
-                          child: const Text("Confirm")),
+                    GetBuilder<SetNewPasswordController>(
+                      builder: (setNewPasswordController) {
+                        return Visibility(
+                          visible: setNewPasswordController.loading == false,
+                          replacement: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                          child: ElevatedButton(
+                              onPressed: () {
+                                resetPassword();
+                              },
+                              style: const ButtonStyle(
+                                  padding:
+                                      MaterialStatePropertyAll<EdgeInsetsGeometry>(
+                                          EdgeInsets.symmetric(vertical: 15.0))),
+                              child: const Text("Confirm")),
+                        );
+                      }
                     ),
                     verticle(48),
                     Row(
@@ -122,41 +127,22 @@ class _SetPasswordState extends State<SetPassword> {
       ),
     );
   }
-
   Future<void> resetPassword() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    _loading = true;
-    if (mounted) {
-      setState(() {});
-    }
-    NetworkResponse response = await NetworkCaller().postRequest(
-      Urls.setPassword,
-      body: {
-        "email": widget.email,
-        "OTP": widget.email,
-        "password": _passwordTEController.text,
-      },
-
     
-    );
-    _loading = false;
-    if (mounted) {
-      setState(() {});
-    }
-    if (response.isSuccess) {
+    final response = await setNewPasswordController.resetPassword(email: widget.email, otp: widget.otp, password: _confirmpassTEController.text);
+    if (response) {
+      
       if (mounted) {
-        Navigator.pushAndRemoveUntil(
-            context,
-            (MaterialPageRoute(
-              builder: (context) => const LoginScreen(),
-            )),
-            (route) => false);
+        showSnackMessage(context, "New password reset succefully");
+        Get.offAll(()=>const LoginScreen());
       }
     } else {
-      _loading = false;
-      setState(() {});
+      if(mounted){
+        showSnackMessage(context, "New password reset failed!");
+      }
     }
   }
 

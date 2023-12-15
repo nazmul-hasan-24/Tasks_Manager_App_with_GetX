@@ -1,57 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:task_manager/controllers/aouth_controller.dart';
-import 'package:task_manager/data/network_caller/network_caller.dart';
-import 'package:task_manager/data/network_caller/network_response.dart';
-import 'package:task_manager/data/utility/urls.dart';
-import 'package:task_manager/ui/screens/set_password.dart';
+import 'package:task_manager/controllers/otp_verifaction_screen_controller.dart';
+import 'package:task_manager/ui/screens/set_new_password.dart';
 import 'package:task_manager/ui/widgets/body_background.dart';
 import 'package:task_manager/ui/widgets/show_snackbar.dart';
 import 'package:task_manager/ui/widgets/verticle.dart';
 
-class PinVerificationScreen extends StatefulWidget {
-  const PinVerificationScreen({super.key, required this.email});
+class OtpVerificationScreen extends StatefulWidget {
+  const OtpVerificationScreen({super.key, required this.email});
   final String email;
 
   @override
-  State<PinVerificationScreen> createState() => _PinVerificationScreenState();
+  State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
 }
 
-class _PinVerificationScreenState extends State<PinVerificationScreen> {
+class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   final TextEditingController _pinController = TextEditingController();
  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  bool showProgress = false;
+OtpVerificationScreenController pinVerificationScreenController = Get.find<OtpVerificationScreenController>();
   Future<void> otpVerification() async {
     if (_formKey.currentState!.validate()) {
-      showProgress = true;
-      if (mounted) {
-        setState(() {});
-      }
-      final NetworkResponse response =
-          await NetworkCaller().getRequest(Urls.otpVerifaction(widget.email, _pinController.text));
+  
+      final  response =
+          await pinVerificationScreenController.otpVerification(email: widget.email, otp: _pinController.text);
 
-      if (response.isSuccess  == true) {
+      if (response) {
        AuthController.initializeUserCache( _pinController.text);
-         showProgress = false;
-        setState(() {});
+         Get.to(()=>SetPassword(email: widget.email, otp: _pinController.text));
         if (mounted) {
-          showSnackMessage(context, 'OTP Verification Success!');
+          showSnackMessage(context, pinVerificationScreenController.message);
         }
-         if (mounted) {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>  SetPassword(email: widget.email , otp: _pinController.text)));
-        }
-
-       
-      } else {
+        } else {
         if (mounted) {
           showSnackMessage(
-              context, 'OTP Verification Failed! Try again.');
-          showProgress = false;
-          setState(() {});
+              context, pinVerificationScreenController.message);
+          
         }
       }
     }
@@ -109,14 +95,18 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
                   ),
                 ),
                 verticle(16.0),
-                Visibility(
-                  visible: showProgress == false,
-                  replacement: const Center(child: CircularProgressIndicator(),),
-                  child: ElevatedButton(
-                      onPressed: () {
-                otpVerification();
-                      },
-                      child: const Icon(Icons.arrow_circle_right_outlined)),
+                GetBuilder<OtpVerificationScreenController>(
+                  builder: (otpVerificationController) {
+                    return Visibility(
+                      visible: otpVerificationController.showProgress == false,
+                      replacement: const Center(child: CircularProgressIndicator(),),
+                      child: ElevatedButton(
+                          onPressed: () {
+                    otpVerification();
+                          },
+                          child: const Icon(Icons.arrow_circle_right_outlined)),
+                    );
+                  }
                 ),
                 verticle(30.0),
                 Row(

@@ -1,6 +1,9 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/controllers/new_tasks_controller.dart';
+import 'package:task_manager/controllers/tasks_count_controller.dart';
 import 'package:task_manager/data/models/task.dart';
 import 'package:task_manager/data/network_caller/network_caller.dart';
 import 'package:task_manager/data/utility/urls.dart';
@@ -103,6 +106,8 @@ class _TasksItemCardState extends State<TasksItemCard> {
                             builder: (context) {
                               return alertDialog(context);
                             });
+                            Get.find<NewTasksController>().getNewTaskList();
+                            Get.find<TasksCountController>().taskSummeryCount();
                       },
                       icon: const Icon(
                         Icons.delete_forever_rounded,

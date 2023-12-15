@@ -4,7 +4,7 @@ import 'package:task_manager/data/models/tasks_count.dart';
 
 class TaskCountSummaryList {
   String? status;
-  List<TasksCount>? taskCountList;
+  List<TasksCount>? taskCountList = [];
 
   TaskCountSummaryList({this.status, this.taskCountList});
 
@@ -13,7 +13,7 @@ class TaskCountSummaryList {
     if (json['data'] != null) {
       taskCountList = <TasksCount>[];
       json['data'].forEach((v) {
-        taskCountList!.add(TasksCount.fromJson(v));
+        taskCountList?.add(TasksCount.fromJson(v));
       });
     }
   }

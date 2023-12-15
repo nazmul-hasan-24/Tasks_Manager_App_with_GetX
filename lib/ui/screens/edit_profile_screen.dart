@@ -2,10 +2,12 @@ import 'dart:convert';
 
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart' show XFile ;
 import 'package:image_picker/image_picker.dart' show ImagePicker ;
 import 'package:image_picker/image_picker.dart' show ImageSource ;
 import 'package:task_manager/controllers/aouth_controller.dart';
+import 'package:task_manager/controllers/edit_profile_controller.dart';
 import 'package:task_manager/data/models/user_model.dart';
 import 'package:task_manager/data/network_caller/network_caller.dart';
 import 'package:task_manager/data/network_caller/network_response.dart';
@@ -29,7 +31,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final TextEditingController _mobileTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool updateProfileInProgress = false;
+  EditProfileController editProfileController = Get.find<EditProfileController>();
+
   XFile? photo;
   @override
   void initState() {
@@ -38,7 +41,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _firstTEController.text = AuthController.user?.firstName ?? '';
     _lastNameTEController.text = AuthController.user?.lastName ?? '';
     _mobileTEController.text = AuthController.user?.mobile ?? '';
-    updateProfile();
+    editProfile();
   }
 
   @override
@@ -136,16 +139,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             obscureText: true,
                           ),
                           verticle(16),
-                          Visibility(
-                            visible: updateProfileInProgress == false,
-                            replacement: const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                            child: ElevatedButton(
-                              onPressed: updateProfile,
-                              child:
-                                  const Icon(Icons.arrow_circle_right_outlined),
-                            ),
+                          GetBuilder<EditProfileController>(
+                            builder: (editProfileController) {
+                              return Visibility(
+                              visible:editProfileController.updateProfileInProgress == false,
+                              replacement: const Center(
+                                child: Center(child: CircularProgressIndicator()),
+                              ),
+                              child: ElevatedButton(
+                                onPressed: editProfile,
+                                child:
+                                    const Icon(Icons.arrow_circle_right_outlined),
+                              ),
+                            );
+                            },
                           ),
                           verticle(25),
                         ],
@@ -160,15 +167,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
     );
   }
-
-  Future<void> updateProfile() async {
+ 
+  Future<void> editProfile() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    updateProfileInProgress = true;
-    if (mounted) {
-      setState(() {});
-    }
+   
     String? photoInBase64;
     Map<String, dynamic> inputData = {
       "email": _emailTEController.text.trim(),
@@ -188,10 +192,6 @@ if(photo != null){
 }
     final NetworkResponse networkResponse =
         await NetworkCaller().postRequest(Urls.updateProfile, body: inputData);
-    updateProfileInProgress = false;
-    if (mounted) {
-      setState(() {});
-    }
     if (networkResponse.isSuccess) {
       AuthController.updateUserInformation(UserModel(
         email: _emailTEController.text.trim(),
@@ -202,11 +202,11 @@ if(photo != null){
       ));
 
       if (mounted) {
-        showSnackMessage(context, 'Profile update successful');
+        showSnackMessage(context, editProfileController.message);
       }
     } else {
       if (mounted) {
-        showSnackMessage(context, 'Profile updation failed');
+        showSnackMessage(context, editProfileController.message);
       }
     }
   }

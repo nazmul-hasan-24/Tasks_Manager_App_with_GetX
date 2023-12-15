@@ -1,8 +1,6 @@
-
 import 'package:flutter/material.dart';
-import 'package:task_manager/data/network_caller/network_caller.dart';
-import 'package:task_manager/data/network_caller/network_response.dart';
-import 'package:task_manager/data/utility/urls.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/controllers/add_new_task_controller.dart';
 import 'package:task_manager/ui/screens/main_bottom_nav_screen.dart';
 import 'package:task_manager/ui/screens/new_task_screen.dart';
 import 'package:task_manager/ui/widgets/body_background.dart';
@@ -11,8 +9,7 @@ import 'package:task_manager/ui/widgets/show_snackbar.dart';
 import 'package:task_manager/ui/widgets/verticle.dart';
 
 class AddNewTask extends StatefulWidget {
- 
-  const AddNewTask({super.key       });
+  const AddNewTask({super.key});
 
   @override
   State<AddNewTask> createState() => _AddNewTaskState();
@@ -23,11 +20,12 @@ class _AddNewTaskState extends State<AddNewTask> {
   final TextEditingController _descriptionTEController =
       TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool _createTaskInProgress = false;
-@override
+  final AddNewTaskController addnewTasksController =
+      Get.find<AddNewTaskController>();
+  @override
   void initState() {
-   super.initState();
-   const NewTaskScreen();
+    super.initState();
+    const NewTaskScreen();
   }
 
   @override
@@ -84,16 +82,21 @@ class _AddNewTaskState extends State<AddNewTask> {
                                 maxLines: 8,
                               ),
                               verticle(15),
-                              Visibility(
-                                visible: _createTaskInProgress == false,
-                                replacement: const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                                child: ElevatedButton(
-                                    onPressed: createTask,
-                                    child: const Icon(
-                                        Icons.arrow_circle_right_outlined)),
-                              )
+                              GetBuilder<AddNewTaskController>(
+                                  builder: (addNewTaskController) {
+                                return Visibility(
+                                  visible: addNewTaskController
+                                          .createTaskInProgress ==
+                                      false,
+                                  replacement: const Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                  child: ElevatedButton(
+                                      onPressed: createTask,
+                                      child: const Icon(
+                                          Icons.arrow_circle_right_outlined)),
+                                );
+                              })
                             ],
                           ),
                         ),
@@ -111,39 +114,24 @@ class _AddNewTaskState extends State<AddNewTask> {
 
   Future<void> createTask() async {
     if (_formKey.currentState!.validate()) {
-      _createTaskInProgress = true;
-      if (mounted) {
-        setState(() {});
-      }
-      final NetworkResponse response = await NetworkCaller().postRequest(
-        Urls.createNewTask,
-       
-        body: {
-          'title': _subjectTEController.text.trim(),
-          'description': _descriptionTEController.text.trim(),
-          'status': 'New',
-          
-        },
-        
+      final response = addnewTasksController.addNewTask(
+        _subjectTEController.text.trim(),
+        _descriptionTEController.text.trim(),
       );
-      _createTaskInProgress = false;
-      if (mounted) {
-        setState(() {});
-      }
-      if (response.isSuccess) {
+
+      if (await response) {
         _subjectTEController.clear();
         _descriptionTEController.clear();
-        
+
         if (mounted) {
-          showSnackMessage(context, 'New task added!');
-       const  NewTaskScreen();
-    
-           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const MainBottomNavScreen()), (route) => false);
+          showSnackMessage(context, addnewTasksController.message);
+
+          Get.offAll(() => const MainBottomNavScreen());
         }
-       
       } else {
         if (mounted) {
-          showSnackMessage(context, 'Create new task failed! Try again.', true);
+
+          showSnackMessage(context, addnewTasksController.message, true);
         }
       }
     }
